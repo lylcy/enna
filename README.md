@@ -23,7 +23,7 @@ Thinkphp 6.0新特征
 * 统一和精简大量用法
 
 ~~~
-获取代码后 在更目录执行 composer install
+获取代码后 在根目录执行 composer install
 ~~~
 
 ## ThinkPHP 6.0文档
