@@ -8,13 +8,17 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-use think\facade\Route;
 
-Route::get('think', function () {
-    return 'hello,ThinkPHP6!';
-});
-
-Route::get('hello/:name', 'index/hello');
-
-//Route::get('test','/api/test/index');
-//Route::get('tset', '\app\api\Test@index');
+// 事件定义文件
+return [
+    'listen'    => [
+        'AppInit'  => [],
+        'HttpRun'  => [],
+        'HttpEnd'  => [],
+        'LogLevel' => [],
+        'LogWrite' => [],
+        'AdminLogin'=>[
+            \enna\listeners\admin\AdminLogin::class
+        ]
+    ]
+];

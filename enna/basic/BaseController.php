@@ -4,8 +4,6 @@ namespace enna\basic;
 use think\exception\ValidateException;
 use think\facade\App;
 use think\Validate;
-use think\exception\HttpResponseException;
-use think\facade\View;
 
 abstract class BaseController{
     /**
