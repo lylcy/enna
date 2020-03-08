@@ -1,17 +1,19 @@
 <?php
-/**
- *
- * @author: xaboy<365615158@qq.com>
- * @day: 2017/11/11
- */
 
 namespace enna\traits;
 
-use think\db\Query;
 use think\Model;
 
 trait ModelTrait
 {
+    /**
+     * 获取某一条收据
+     * @param $where
+     * @return array|Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
     public static function get($where)
     {
         if (!is_array($where)) {
@@ -21,6 +23,14 @@ trait ModelTrait
         }
     }
 
+    /**
+     * 按条件查询所有数据
+     * @param $function
+     * @return \think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
     public static function all($function)
     {
         $query = self::newQuery();
@@ -50,15 +60,14 @@ trait ModelTrait
     {
         $model = new self;
         if (!$field) $field = $model->getPk();
-//        return false !== $model->update($data,[$field=>$id]);
-//        return 0 < $model->update($data,[$field=>$id])->result;
         $res = $model->update($data, [$field => $id]);
-        if (isset($res->result))
+        if (isset($res->result)){
             return 0 < $res->result;
-        else if (isset($res['data']['result']))
+        } else if (isset($res['data']['result'])){
             return 0 < $res['data']['result'];
-        else
+        } else {
             return false !== $res;
+        }
     }
 
 
@@ -217,9 +226,12 @@ trait ModelTrait
 
     /**
      * 获取时间段之间的model
-     * @param int|string $time
-     * @param string $ceil
-     * @return array
+     * @param $where
+     * @param null $model
+     * @param string $prefix
+     * @param string $data
+     * @param string $field
+     * @return ModelTrait|null
      */
     public static function getModelTime($where, $model = null, $prefix = 'add_time', $data = 'data', $field = ' - ')
     {
@@ -300,12 +312,15 @@ trait ModelTrait
 
     /**
      * 高精度 加法
-     * @param int|string $uid id
-     * @param string $decField 相加的字段
-     * @param float|int $dec 加的值
-     * @param string $keyField id的字段
-     * @param int $acc 精度
+     * @param $key
+     * @param $incField
+     * @param $inc
+     * @param null $keyField
+     * @param int $acc
      * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
      */
     public static function bcInc($key, $incField, $inc, $keyField = null, $acc = 2)
     {
@@ -323,22 +338,33 @@ trait ModelTrait
 
     /**
      * 高精度 减法
-     * @param int|string $uid id
-     * @param string $decField 相减的字段
-     * @param float|int $dec 减的值
-     * @param string $keyField id的字段
-     * @param bool $minus 是否可以为负数
-     * @param int $acc 精度
+     * @param $key 搜索条件
+     * @param $decField 减少字段名称
+     * @param $dec
+     * @param null $keyField
+     * @param bool $minus
+     * @param int $acc
      * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
      */
     public static function bcDec($key, $decField, $dec, $keyField = null, $minus = false, $acc = 2)
     {
-        if (!is_numeric($dec)) return false;
+        if (!is_numeric($dec)) {
+            return false;
+        }
         $model = new self();
-        if ($keyField === null) $keyField = $model->getPk();
+        if ($keyField === null){
+            $keyField = $model->getPk();
+        }
         $result = self::where($keyField, $key)->find();
-        if (!$result) return false;
-        if (!$minus && $result[$decField] < $dec) return false;
+        if (!$result){
+            return false;
+        }
+        if (!$minus && $result->getData($decField) < $dec){
+            return false;
+        }
         $new = bcsub($result[$decField], $dec, $acc);
         $result->$decField = $new;
         return false !== $result->save();
@@ -346,8 +372,42 @@ trait ModelTrait
     }
 
     /**
+     * 使用乐观锁更新
+     * @param array $update 更新的数据
+     * @param $params 更新的条件
+     * @param $update_time 更新时间
+     * @return bool|int|string
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public static function updateFByOptimisticLock(array $update,$params,$update_time){
+        $map = [];
+        if(!is_array($params)){
+            if(!is_numeric($params)){
+                return false;
+            }
+            $map[(new self())->getPk()] = $params;
+        }else{
+            $map = $params;
+        }
+        $map['update_time'] = $update_time;
+        $result = false;
+        $i = 1;
+        while (true){
+            if($i>5){
+                break;
+            }
+            $result = self::where($map)->update($update);
+            if($result){
+                break;
+            }
+            $i++;
+        }
+        return $result;
+    }
+    /**
      * @param null $model
-     * @return Model
+     * @return ModelTrait|null
      */
     protected static function getSelfModel($model = null)
     {

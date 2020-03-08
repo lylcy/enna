@@ -10,3 +10,12 @@ function backResult($errorCode = 0,$message = '操作成功',$data = []){
         return app('json')->fail($message,$return);
     }
 }
+
+//设置分页页数
+function setPage($count,$page,$limit){
+    $pageInfo = [];
+    $pageInfo['totalCount'] = $count;
+    $pageInfo['currentPage'] = $page;
+    $pageInfo['totalPage'] = ceil($count/ $limit);
+    return $pageInfo;
+}

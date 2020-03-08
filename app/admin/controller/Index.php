@@ -8,11 +8,11 @@ use app\admin\model\AdminModel;
 use app\Request;
 
 
-class Index extends BaseAdminController
+class Index
 {
 
     public function index(Request $request){
-        $data = $request->admin;
+        $data = $request->admin()->toArray();
         return app('json')->success('执行成功', $data);
     }
 

@@ -16,7 +16,7 @@ class Json
         return $this;
     }
 
-    public function make(int $status, string $message, ?array $data = null,int $errorCode = 0): Response
+    public function makeTo(int $status, string $message, ?array $data = null,int $errorCode = 0): Response
     {
         $res = compact('status', 'message','errorCode');
 
@@ -34,7 +34,7 @@ class Json
             $msg = 'ok';
         }
 
-        return $this->make(200, $msg, $data);
+        return $this->makeTo(200, $msg, $data);
     }
 
     public function successful(...$args): Response
@@ -56,7 +56,7 @@ class Json
                 }
             }
         }
-        return $this->make(400, $msg, $data,$errorCode);
+        return $this->makeTo(400, $msg, $data,$errorCode);
     }
 
     public function status($status, $msg, $result = [])

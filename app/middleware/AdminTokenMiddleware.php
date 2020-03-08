@@ -9,7 +9,7 @@ use app\Request;
 use enna\exceptions\lib\AuthTokenException;
 use enna\interfaces\MiddlewareInterface;
 use enna\repositories\AdminRepositorie;
-
+use think\facade\App;
 
 
 class AdminTokenMiddleware implements MiddlewareInterface
@@ -18,6 +18,10 @@ class AdminTokenMiddleware implements MiddlewareInterface
 
     public function handle(Request $request, \Closure $next, $force = true)
     {
+        if($request->url() == '/admin/login'
+            || $request->controller() == '/Admin/Login'){
+            return $next($request);
+        }
         $authInfo = null;
         $token = $request->header('Authorization');
         if(!$token){
@@ -25,15 +29,14 @@ class AdminTokenMiddleware implements MiddlewareInterface
         }
         if(!$token){
             $sattus = 400;
-            return app('json')->make($sattus, '暂未登录');
+            return app('json')->makeTo($sattus, '暂未登录');
         }
         $token = trim(ltrim($token, 'Bearer'));
         try {
             $authInfo = AdminRepositorie::parseToken($token);
         } catch (AuthTokenException $e){
             if ($force){
-//                return app('json')->make(98746,$e->getLine());
-                return app('json')->fail($e->getLine());
+                return app('json')->fail($e->getMessage());
             }
         }
         if (!is_null($authInfo)) {

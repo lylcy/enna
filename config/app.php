@@ -19,7 +19,8 @@ return [
     // 自动多应用模式
     'auto_multi_app'   => true,
     // 应用映射（自动多应用模式有效）
-    'app_map'          =>  ['*'=>'', 'api'=>'api', 'admin'=>'admin','wap'=>'wap'],
+//    'app_map'          =>  ['*'=>'', 'api'=>'api', 'admin'=>'admin','wap'=>'wap'],
+    'app_map'          =>  [],
     // 域名绑定（自动多应用模式有效）
     'domain_bind'      => [],
     // 禁止URL访问的应用列表（自动多应用模式有效）

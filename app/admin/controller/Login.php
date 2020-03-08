@@ -10,13 +10,18 @@ use app\model\admin\AdminTokenModel;
 
 class Login
 {
+    /**
+     * 用户登录接口
+     * @return mixed
+     * @throws \enna\exceptions\lib\ParamerException
+     */
     public function login(){
         $validate = new LoginValidate();
         $validate->checkParams();
         $params = $validate->getDataByRule(input('post.'));
         $admin = AdminModel::getAdminByAccount($params['account']);
         if($admin) {
-            if ($admin->getData('password') !== md5($params['password'].$admin->getData('salt'))){
+            if ($admin->getData('password') != md5($params['password'].$admin->getData('salt'))){
                 return app('json')->fail('账号或密码错误');
             }
         }else{

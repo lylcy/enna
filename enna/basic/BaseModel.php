@@ -71,4 +71,44 @@ class BaseModel extends Model
             self::roobackTrans();
         }
     }
+
+    public function getPaging(
+        $page = 1,
+        $limit = 15,
+        $params = [],
+        $order = '',
+        $relation = [],
+        $appends = [],
+        $hidden = [],
+        $fields = ''
+    ){
+        if($relation){
+            $query = self::with($relation);
+
+        }else{
+            $query = self::where([]);
+        }
+        if($params){
+            $query->where($params);
+        }
+        if($order){
+            $query->order($order);
+        }
+        if($fields){
+            $query->fieldRaw($fields);
+        }
+        if($hidden){
+            $query->hidden($hidden);
+        }
+        $count = $query->count();
+        $list = $query
+            ->page($page,$limit)
+            ->select();
+        if($appends){
+            $list->append($appends);
+        }
+        $list = $list->toArray();
+        return ['count'=>$count,'list'=>$list];
+    }
+
 }
